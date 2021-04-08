@@ -33,6 +33,8 @@ class ChatViewController: UIViewController {
         navigationItem.hidesBackButton = true
         title = "Chat Screen"
         // Do any additional setup after loading the view.
+        
+        tableView.register(UINib(nibName: "MessageCell", bundle: nil), forCellReuseIdentifier: "ReusableCell")
         loadData()
     }
     func loadData() {
@@ -87,12 +89,20 @@ class ChatViewController: UIViewController {
 
                                    self.messages.append(newMessage)
 
-                                       
+                                           
 
-                                       
+                                    DispatchQueue.main.async {
+                                        
+                                        self.tableView.reloadData()
 
-                                   self.tableView.reloadData()
+                                        
+                                        let indexPath = IndexPath(row: self.messages.count-1, section: 0)
+                                        
+                                        self.tableView.scrollToRow(at: indexPath, at: .top, animated: true)
+                                           
+                                    }
 
+                                  
                                        
 
                                    
@@ -222,9 +232,28 @@ extension ChatViewController: UITableViewDataSource{
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         
-        let cell = tableView.dequeueReusableCell(withIdentifier: "ReusableCell", for: indexPath)
+        let message = messages[indexPath.row]
         
-        cell.textLabel?.text = messages[indexPath.row].body
+        let cell = tableView.dequeueReusableCell(withIdentifier: "ReusableCell", for: indexPath) as! MessageCell
+        
+        //SettingUser
+        cell.label.text = message.body
+        
+        if message.sender == Auth.auth().currentUser?.email {
+            
+            cell.MeImage.isHidden = false
+            cell.youImage.isHidden = true
+            
+        }
+       
+        else {
+            
+            cell.MeImage.isHidden = true
+            cell.youImage.isHidden = false
+            
+        }
+        
+        
         return cell
         
         
